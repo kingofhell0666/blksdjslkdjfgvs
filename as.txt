@@ -109,7 +109,7 @@
                             <b>${user.nick}</b><br>
                             <i>${user.pontos} pt</i>&nbsp;&nbsp;
                             <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                            <span class="download-btn" onclick="downloadPhoto('${foto}', '${user.nick}')">Fotoğrafı İndir</span>
+                            <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profilini Görüntüle</span>
                         </div>
                     </div>
                 `;
@@ -135,52 +135,49 @@
             profileContainer.style.display = 'none';
         }
 
-        function downloadPhoto(photoURL, userName) {
-            const downloadLink = document.createElement('a');
-            downloadLink.href = photoURL;
-            downloadLink.download = `${userName}_photo.png`;
-            downloadLink.target = "_blank";
-            downloadLink.click();
-        }
-
         function filterUsers() {
             const users = fa(".user");
             const havefotoCheckbox = f("#havefotoCheckbox");
             const nofotoCheckbox = f("#nofotoCheckbox");
 
-            if (havefotoCheckbox.checked) {
-                nofotoCheckbox.disabled = false;
-            } else if (nofotoCheckbox.checked) {
-                havefotoCheckbox.disabled = false;
-            } else {
-                havefotoCheckbox.disabled = false;
-                nofotoCheckbox.disabled = false;
-            }
+            const isHaveFotoChecked = havefotoCheckbox.checked;
+            const isNoFotoChecked = nofotoCheckbox.checked;
 
             users.forEach(user => {
                 const havefoto = user.classList.contains("havefoto");
                 const nofoto = user.classList.contains("nofoto");
 
-                if ((havefotoCheckbox.checked && havefoto) || (nofotoCheckbox.checked && nofoto)) {
+                // Her iki checkbox da işaretli değilse filtreleme yapılacak
+                if ((!isHaveFotoChecked && !isNoFotoChecked) || 
+                    (isHaveFotoChecked && havefoto) || 
+                    (isNoFotoChecked && nofoto)) {
                     user.style.display = "flex";
                 } else {
                     user.style.display = "none";
                 }
             });
 
-            updatePlayerCount(document.querySelectorAll('.user:visible').length);
+            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
         }
 
         function searchUsers() {
             const users = fa(".user");
             const searchInput = f("#searchInput").value.toLowerCase();
 
+            let visibleUsers = 0;
             users.forEach(user => {
                 const userName = user.querySelector("b").textContent.toLowerCase();
-                user.style.display = userName.includes(searchInput) ? "flex" : "none";
+                const isMatchingSearch = userName.includes(searchInput);
+
+                if (isMatchingSearch) {
+                    user.style.display = "flex";
+                    visibleUsers++;
+                } else {
+                    user.style.display = "none";
+                }
             });
 
-            updatePlayerCount(document.querySelectorAll('.user:visible').length);
+            updatePlayerCount(visibleUsers);
         }
 
         function listusers(lang) {
