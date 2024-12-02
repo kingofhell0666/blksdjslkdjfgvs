@@ -31,10 +31,10 @@
 
     <!-- Filtreleme kutucukları -->
     <label>
-        <input type="checkbox" id="havefotoCheckbox"> Profil Fotoğrafı Olanlar
+        <input type="checkbox" id="havefotoCheckbox" onchange="filterUsers()"> Profil Fotoğrafı Olanlar
     </label>
     <label>
-        <input type="checkbox" id="nofotoCheckbox"> Profil Fotoğrafı Olmayanlar
+        <input type="checkbox" id="nofotoCheckbox" onchange="filterUsers()"> Profil Fotoğrafı Olmayanlar
     </label>
 
     <!-- Arama kutusu -->
@@ -233,7 +233,10 @@
                 .catch(error => console.error('Error fetching room list:', error));
         }
 
-        listusers(8);  // Dili 8 (Türkçe) olarak belirle
+        // Sayfa yüklendiğinde kullanıcıları listele
+        window.onload = () => {
+            listusers("en");
+        };
     </script>
 </body>
 </html>
