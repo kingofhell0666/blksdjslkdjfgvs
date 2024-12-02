@@ -142,30 +142,43 @@
             totalPlayerCountElement.textContent = `Toplam kişi sayısı: ${count}`;
         }
 
-        function addPlayers(users, roomlink) {
-            const usersContainer = f("#usersContainer");
-            totalPlayerCount += users.length;
-            updateTotalPlayerCount(totalPlayerCount);
-            updatePlayerCount(users.length);
+        function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
-            users.forEach(user => {
-                const foto = user.foto || "https://gartic.io/static/images/avatar/svg/" + user.avatar + ".svg";
-                const uclass = user.foto ? "havefoto" : "nofoto";
+function addPlayers(users, roomlink) {
+    const usersContainer = f("#usersContainer");
+    totalPlayerCount += users.length;
+    updateTotalPlayerCount(totalPlayerCount);
+    updatePlayerCount(users.length);
 
-                usersContainer.innerHTML += `
-                    <div class="user flex ${uclass}">
-                        <img width="40" src="${foto}" alt="">
-                        <div>
-                            <b>${user.nick}</b><br>
-                            <i>${user.pontos} pt</i>&nbsp;&nbsp;
-                            <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                            <a target="_blank" href="https://gartic.io/${roomlink}/viewer">#${roomlink} izle</a>
-                            <span class="download-btn" onclick="openProfile('${foto}')">Profil Fotoğrafını Aç</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
+    // Rastgele renk seç
+    const roomColor = getRandomColor();
+
+    users.forEach(user => {
+        const foto = user.foto || "https://gartic.io/static/images/avatar/svg/" + user.avatar + ".svg";
+        const uclass = user.foto ? "havefoto" : "nofoto";
+
+        usersContainer.innerHTML += `
+            <div class="user flex ${uclass}" style="border-left: 5px solid ${roomColor}">
+                <img width="40" src="${foto}" alt="">
+                <div>
+                    <b>${user.nick}</b><br>
+                    <i>${user.pontos} pt</i>&nbsp;&nbsp;
+                    <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
+                    <a target="_blank" href="https://gartic.io/${roomlink}/viewer">#${roomlink} izle</a><br>
+                    <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profili Görüntüle</span>
+                </div>
+            </div>
+        `;
+    });
+}
+
 
         function openProfile(foto) {
             window.open(foto, '_blank'); // Fotoğraf linkini yeni sekmede aç
