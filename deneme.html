@@ -68,7 +68,7 @@
             const response = await fetch(`https://gartic.io/req/list?search=&language[]=8`);
             const rooms = await response.json();
 
-            // Aktif odaları filtrele (quant >= 1)
+            // Filtreleme: sadece "quant" değeri 1 ve üzeri olan odalar aktif kabul edilir
             const activeRooms = rooms.filter(room => room.quant >= 1);
 
             // Sağ tarafta aktif oda sayısını göster
