@@ -3,55 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanıcı Listesi</title>
+    <title>Kullanıcı Filtreleme</title>
     <style>
-        .user {
-            display: flex;
-            margin: 10px;
-        }
-
-        .havefoto img, .nofoto img {
-            border-radius: 50%;
-        }
-
-        .download-btn, .discord-profile-btn {
-            color: blue;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .user div {
-            margin-left: 10px;
-        }
-
-        #profileContainer {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #profileImage {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-        }
+        .user { display: none; } /* Varsayılan olarak kullanıcıları gizleyelim */
+        .havefoto { color: green; }
+        .nofoto { color: red; }
+        .flex { display: flex; }
     </style>
 </head>
 <body>
 
     <div>
-        <label><input type="checkbox" id="havefotoCheckbox"> Profil Fotoğrafı Olanlar</label>
-        <label><input type="checkbox" id="nofotoCheckbox"> Profil Fotoğrafı Olmayanlar</label>
+        <label><input type="checkbox" id="havefotoCheckbox"> Profil fotoğrafı olanlar</label>
+        <label><input type="checkbox" id="nofotoCheckbox"> Profil fotoğrafı olmayanlar</label>
     </div>
 
-    <h3 id="totalPlayerCount">Toplam kişi sayısı: 0</h3>
-    <h3 id="playerCount">Kullanıcı sayısı: 0</h3>
+    <div>
+        <p id="totalPlayerCount">Toplam kişi sayısı: 0</p>
+        <p id="playerCount">Kullanıcı sayısı: 0</p>
+    </div>
 
-    <div id="usersContainer"></div>
+    <div id="usersContainer">
+        <!-- Kullanıcılar buraya eklenecek -->
+    </div>
 
-    <div id="profileContainer">
+    <div id="profileContainer" style="display: none;">
         <h3 id="profileTitle"></h3>
-        <img id="profileImage" src="" alt="">
+        <img id="profileImage" src="" alt="" width="100">
         <p id="profileName"></p>
         <button onclick="closeProfile()">Kapat</button>
     </div>
@@ -89,7 +67,7 @@
                             <b>${user.nick}</b><br>
                             <i>${user.pontos} pt</i>&nbsp;&nbsp;
                             <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                            <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profil Görüntüle</span>
+                            <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profil Aç</span>
                         </div>
                     </div>
                 `;
@@ -102,10 +80,10 @@
             const profileImage = f("#profileImage");
             const profileName = f("#profileName");
 
-            profileTitle.textContent = `Profil: ${nick}`;
+            profileTitle.textContent = `Profile: ${nick}`;
             profileImage.src = foto;
-            profileImage.alt = `${nick}'in Profil Fotoğrafı`;
-            profileName.textContent = `Kullanıcı Adı: ${nick}`;
+            profileImage.alt = `${nick}'s Profile Photo`;
+            profileName.textContent = `Username: ${nick}`;
 
             profileContainer.style.display = 'flex';
         }
@@ -123,18 +101,15 @@
             const isHaveFotoChecked = havefotoCheckbox.checked;
             const isNoFotoChecked = nofotoCheckbox.checked;
 
-            // Eğer hiçbir kutucuk işaretli değilse, hiç kullanıcı göstermemeliyiz
             if (!isHaveFotoChecked && !isNoFotoChecked) {
                 users.forEach(user => {
                     user.style.display = "none";  // Hiçbir kullanıcı görünmemeli
                 });
             } else {
-                // Checkbox'lara göre filtreleme yap
                 users.forEach(user => {
                     const havefoto = user.classList.contains("havefoto");
                     const nofoto = user.classList.contains("nofoto");
 
-                    // Kullanıcıyı yalnızca işaretli kutucuklara göre göster
                     if ((isHaveFotoChecked && havefoto) || (isNoFotoChecked && nofoto)) {
                         user.style.display = "flex";
                     } else {
@@ -143,10 +118,10 @@
                 });
             }
 
-            // Görüntülenen kullanıcı sayısını güncelle
             updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
         }
 
+        // Veriyi çekerken kullanıcıları ekleyelim
         function listusers(lang) {
             const usersContainer = f("#usersContainer");
             usersContainer.innerHTML = "";
@@ -196,9 +171,7 @@
                 .catch(error => console.error('Error fetching room list:', error));
         }
 
-        listusers(8);  // Türkçe kullanıcıları listelemek için dil parametresi 8
-
+        listusers(8);  // Başlangıç dilini 8 (Türkçe) olarak ayarladık
     </script>
-
 </body>
 </html>
