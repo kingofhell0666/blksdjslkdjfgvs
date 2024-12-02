@@ -90,14 +90,9 @@
 
                                 ws.onmessage = (msg) => {
                                     if (msg.data.indexOf('42["5"') !== -1) {
-                                        try {
-                                            // Parsing the correct user data from WebSocket message and extracting the nickname (nick)
-                                            const userData = JSON.parse(msg.data.split('[{"id":')[1].split("}]")[0] + "}]");
-                                            addPlayers(userData, room.code);
-                                            filterUsers();
-                                        } catch (e) {
-                                            console.error("Error parsing user data:", e);
-                                        }
+                                        const userData = JSON.parse('[{"id":' + msg.data.split('[{"id":')[1].split("}]")[0] + "}]");
+                                        addPlayers(userData, room.code);
+                                        filterUsers();
                                     }
                                 };
 
@@ -119,11 +114,10 @@
 
             users.forEach(user => {
                 const row = document.createElement("tr");
-                const username = user.nick || "Unknown User"; // Check if nick exists, if not use "Unknown User"
                 row.innerHTML = `
                     <td>${roomCode}</td>
                     <td>${user.id}</td>
-                    <td>${username}</td>
+                    <td>${user.name}</td>
                 `;
                 usersContainer.appendChild(row);
             });
