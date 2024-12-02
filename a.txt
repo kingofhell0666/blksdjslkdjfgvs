@@ -135,7 +135,7 @@
             profileContainer.style.display = 'none';
         }
 
-       function filterUsers() {
+     function filterUsers() {
     const users = fa(".user");
     const havefotoCheckbox = f("#havefotoCheckbox");
     const nofotoCheckbox = f("#nofotoCheckbox");
@@ -143,22 +143,30 @@
     const isHaveFotoChecked = havefotoCheckbox.checked;
     const isNoFotoChecked = nofotoCheckbox.checked;
 
-    users.forEach(user => {
-        const havefoto = user.classList.contains("havefoto");
-        const nofoto = user.classList.contains("nofoto");
+    // Eğer hiçbir kutucuk işaretli değilse, hiç kullanıcı göstermemeliyiz
+    if (!isHaveFotoChecked && !isNoFotoChecked) {
+        users.forEach(user => {
+            user.style.display = "none";  // Hiçbir kullanıcı görünmemeli
+        });
+    } else {
+        // Checkbox'lara göre filtreleme yap
+        users.forEach(user => {
+            const havefoto = user.classList.contains("havefoto");
+            const nofoto = user.classList.contains("nofoto");
 
-        // Her iki checkbox da işaretli değilse, tüm kullanıcılar görünmeli
-        if ((!isHaveFotoChecked && !isNoFotoChecked) || 
-            (isHaveFotoChecked && havefoto) || 
-            (isNoFotoChecked && nofoto)) {
-            user.style.display = "flex";
-        } else {
-            user.style.display = "none";
-        }
-    });
+            // Eğer işaretli kutucuk varsa, ona göre kullanıcıyı göster
+            if ((isHaveFotoChecked && havefoto) || (isNoFotoChecked && nofoto)) {
+                user.style.display = "flex";
+            } else {
+                user.style.display = "none";
+            }
+        });
+    }
 
+    // Görüntülenen kullanıcı sayısını güncelle
     updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
 }
+
 
         function searchUsers() {
             const users = fa(".user");
