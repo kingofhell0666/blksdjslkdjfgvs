@@ -34,12 +34,12 @@
         .user img {
             border-radius: 50%;
         }
-        .download-btn, .discord-profile-btn {
+        .download-btn {
             cursor: pointer;
             color: #007bff;
             text-decoration: underline;
         }
-        .download-btn:hover, .discord-profile-btn:hover {
+        .download-btn:hover {
             color: #0056b3;
         }
     </style>
@@ -51,7 +51,6 @@
         <div>
             <label><input type="checkbox" id="havefotoCheckbox"> Fotoğrafı Olanlar</label>
             <label><input type="checkbox" id="nofotoCheckbox"> Fotoğrafı Olmayanlar</label>
-            <label><input type="checkbox" id="discordCheckbox"> Discord Profili Olanlar</label>
         </div>
         <input type="text" id="searchInput" placeholder="Kullanıcı Ara" oninput="searchUsers()">
         <div id="usersContainer"></div>
@@ -94,28 +93,19 @@
             users.forEach(user => {
                 const foto = user.foto || "https://gartic.io/static/images/avatar/svg/" + user.avatar + ".svg";
                 const uclass = user.foto ? "havefoto" : "nofoto";
-                const discordClass = foto.includes("cdn.discordapp.com") ? "discord" : "";
 
                 usersContainer.innerHTML += `
-                    <div class="user flex ${uclass} ${discordClass}">
+                    <div class="user flex ${uclass}">
                         <img width="40" src="${foto}" alt="">
                         <div>
                             <b>${user.nick}</b><br>
                             <i>${user.pontos} pt</i>&nbsp;&nbsp;
                             <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
                             <span class="download-btn" onclick="downloadPhoto('${foto}', '${user.nick}')">Fotoğrafı İndir</span>
-                            ${discordClass ? `<span class="discord-profile-btn" onclick="openDiscordProfile('${foto}')">Discord Profili</span>` : ""}
                         </div>
                     </div>
                 `;
             });
-        }
-
-        function openDiscordProfile(avatarURL) {
-            const discordID = extractDiscordID(avatarURL);
-            if (discordID) {
-                window.open(`https://discordlookup.com/user/${discordID}`, '_blank');
-            }
         }
 
         function openProfile(nick, foto) {
@@ -149,36 +139,21 @@
             const users = fa(".user");
             const havefotoCheckbox = f("#havefotoCheckbox");
             const nofotoCheckbox = f("#nofotoCheckbox");
-            const discordCheckbox = f("#discordCheckbox");
-
-            if (havefotoCheckbox.checked) {
-                nofotoCheckbox.disabled = false;
-                discordCheckbox.disabled = true;
-            } else if (nofotoCheckbox.checked) {
-                havefotoCheckbox.disabled = false;
-                discordCheckbox.disabled = true;
-            } else if (discordCheckbox.checked) {
-                havefotoCheckbox.disabled = true;
-                nofotoCheckbox.disabled = true;
-            } else {
-                havefotoCheckbox.disabled = false;
-                nofotoCheckbox.disabled = false;
-                discordCheckbox.disabled = false;
-            }
 
             users.forEach(user => {
-                const havefoto = user.classList.contains("havefoto");
-                const nofoto = user.classList.contains("nofoto");
-                const discord = user.classList.contains("discord");
+                const hasFoto = user.classList.contains("havefoto");
+                const hasNoFoto = user.classList.contains("nofoto");
 
-                if ((havefotoCheckbox.checked && havefoto) || (nofotoCheckbox.checked && nofoto) || (discordCheckbox.checked && discord)) {
-                    user.style.display = "flex";
-                } else {
+                if (havefotoCheckbox.checked && !hasFoto) {
                     user.style.display = "none";
+                } else if (nofotoCheckbox.checked && !hasNoFoto) {
+                    user.style.display = "none";
+                } else {
+                    user.style.display = "flex";
                 }
             });
 
-            updatePlayerCount(document.querySelectorAll('.user:visible').length);
+            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
         }
 
         function searchUsers() {
@@ -190,7 +165,7 @@
                 user.style.display = userName.includes(searchInput) ? "flex" : "none";
             });
 
-            updatePlayerCount(document.querySelectorAll('.user:visible').length);
+            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
         }
 
         function listusers(lang) {
@@ -237,11 +212,6 @@
                     fetchRoom();
                 })
                 .catch(error => console.error('Error fetching room list:', error));
-        }
-
-        function extractDiscordID(avatarURL) {
-            const matches = avatarURL.match(/\/avatars\/(\d+)\//);
-            return matches ? matches[1] : null;
         }
 
         listusers(8);
