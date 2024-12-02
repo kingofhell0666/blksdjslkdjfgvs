@@ -146,7 +146,6 @@
 
         function updatePlayerCount(count) {
             const playerCountElement = f("#playerCount");
-            playerCountElement.textContent = `${count} kullanıcı`;
         }
 
         function updateTotalPlayerCount(count) {
