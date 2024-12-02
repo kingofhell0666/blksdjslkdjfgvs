@@ -4,85 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kullanıcılar Listesi</title>
-    <!-- Bootstrap CSS Linki -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .user {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            width: 120px;
-            background-color: #f8f9fa;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
         }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .filters {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filters label {
+            margin: 0 10px;
+        }
+
+        .filters input {
+            margin-right: 5px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #usersContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            justify-items: center;
+        }
+
+        .user {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 120px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .user:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
         .user img {
-            width: 60px;
-            height: 60px;
             border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
             margin-bottom: 10px;
         }
-        .user:hover {
-            transform: translateY(-5px);
+
+        .user b {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
         }
-        .user .download-btn, .user .discord-profile-btn {
+
+        .user i {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .download-btn, .discord-profile-btn {
             cursor: pointer;
-            color: blue;
+            color: #007BFF;
             text-decoration: underline;
             font-size: 12px;
         }
-        .user b {
+
+        .download-btn:hover, .discord-profile-btn:hover {
+            color: #0056b3;
+        }
+
+        #profileContainer {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #profileContainer div {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #profileImage {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
             font-size: 14px;
         }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
+
+        button:hover {
+            background-color: #0056b3;
         }
-        .search-container {
-            margin-bottom: 20px;
+
+        #totalPlayerCount {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="my-4 text-center">Kullanıcılar Listesi</h1>
+    <h1>Kullanıcılar Listesi</h1>
 
-        <!-- Arama ve Filtreleme -->
-        <div class="search-container d-flex justify-content-between mb-3">
-            <input type="text" id="searchInput" class="form-control w-50" oninput="searchUsers()" placeholder="Kullanıcı Ara...">
-            <div>
-                <label>
-                    <input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olan
-                </label>
-                <label class="ml-2">
-                    <input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olmayan
-                </label>
-            </div>
-        </div>
+    <div class="filters">
+        <label>
+            <input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olan
+        </label>
+        <label>
+            <input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olmayan
+        </label>
+    </div>
 
-        <div id="playerCount" class="text-center mb-3">0 kullanıcı</div>
-        <div id="totalPlayerCount" class="text-center mb-3">Toplam kişi sayısı: 0</div>
+    <input type="text" id="searchInput" oninput="searchUsers()" placeholder="Kullanıcı Ara...">
 
-        <div id="usersContainer" class="container"></div>
+    <div id="playerCount">0 kullanıcı</div>
+    <div id="totalPlayerCount">Toplam kişi sayısı: 0</div>
 
-        <div id="profileContainer" style="display:none; flex-direction: column; align-items: center;">
+    <div id="usersContainer"></div>
+
+    <div id="profileContainer">
+        <div>
             <h2 id="profileTitle"></h2>
-            <img id="profileImage" width="100" alt="Profile Photo">
+            <img id="profileImage" alt="Profile Photo">
             <p id="profileName"></p>
-            <button class="btn btn-secondary" onclick="closeProfile()">Kapat</button>
+            <button onclick="closeProfile()">Kapat</button>
         </div>
     </div>
 
-    <!-- Bootstrap JS ve jQuery Bağlantıları -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         const f = (x) => { return document.querySelector(x) }
         const fa = (x) => { return document.querySelectorAll(x) }
@@ -110,12 +200,14 @@
                 const uclass = user.foto ? "havefoto" : "nofoto";
 
                 usersContainer.innerHTML += `
-                    <div class="user ${uclass} text-center">
+                    <div class="user ${uclass}">
                         <img src="${foto}" alt="">
-                        <b>${user.nick}</b><br>
-                        <i>${user.pontos} pt</i><br>
-                        <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                        <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profili Görüntüle</span>
+                        <div>
+                            <b>${user.nick}</b>
+                            <i>${user.pontos} pt</i><br>
+                            <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
+                            <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profili Görüntüle</span>
+                        </div>
                     </div>
                 `;
             });
@@ -162,7 +254,7 @@
 
             if (!isHaveFotoChecked && !isNoFotoChecked) {
                 users.forEach(user => {
-                    user.style.display = "none";
+                    user.style.display = "none";  // Hiçbir kullanıcı görünmemeli
                 });
             } else {
                 users.forEach(user => {
@@ -189,41 +281,19 @@
                 .then(rooms => {
                     let index = 0;
 
-                    function fetchRoom() {
-                        if (index >= rooms.length) return;
+                    function getData(rooms) {
+                        if (index == rooms.length) return;
 
                         const room = rooms[index];
                         index++;
 
-                        fetch(`https://gartic.io/serverViewer?v3=1&room=${room.code}`)
-                            .then(x => x.text())
-                            .then(x => {
-                                const roomSC = x.split("https://")[1].split(".")[0];
-                                let ws = new WebSocket(`wss://${roomSC}.gartic.io/socket.io/?EIO=3&transport=websocket`);
-
-                                ws.onopen = () => {
-                                    ws.send('42[12,{"v":20000,"platform":0,"sala":"' + room.id + '"}]')
-                                    ws.send('42[46,0]')
-                                }
-
-                                ws.onmessage = (msg) => {
-                                    if (msg.data.indexOf('42["5"') !== -1) {
-                                        addPlayers(JSON.parse('[{"id":' + msg.data.split('[{"id":')[1].split("}]")[0] + "}]"), room.code);
-                                        filterUsers();
-                                    }
-                                }
-
-                                setTimeout(fetchRoom, 2000);
-                            })
-                            .catch(error => {
-                                console.error(`Error fetching room data for ${room.code}:`, error);
-                                setTimeout(fetchRoom, 2000);
-                            });
+                        addPlayers(room.users, room.room);
+                        setTimeout(() => { getData(rooms); }, 100);
                     }
 
-                    fetchRoom();
+                    getData(rooms);
                 })
-                .catch(error => console.error('Error fetching room list:', error));
+                .catch(e => { console.error(e); });
         }
 
         listusers("tr");
