@@ -208,35 +208,48 @@
             updatePlayerCount(document.querySelectorAll('.user:visible').length);
         }
 
-        function listusers(lang) {
-            const usersContainer = f("#usersContainer");
-            usersContainer.innerHTML = "";
+      let roomQueue = []; // Sıradaki odalar için kuyruk
 
-            fetch(`https://gartic.io/req/list?search=&language[]=8`)
-                .then(x => x.json())
-                .then(x => {
-                    x.forEach(room => {
-                        fetch(`https://gartic.io/serverViewer?v3=1&room=${room.code}`)
-                            .then(x => x.text())
-                            .then(x => {
-                                const roomSC = x.split("https://")[1].split(".")[0];
-                                let ws = new WebSocket(`wss://${roomSC}.gartic.io/socket.io/?EIO=3&transport=websocket`);
+function listusers(lang) {
+    const usersContainer = f("#usersContainer");
+    usersContainer.innerHTML = "";
 
-                                ws.onopen = () => {
-                                    ws.send('42[12,{"v":20000,"platform":0,"sala":"' + room.id + '"}]')
-                                    ws.send('42[46,0]')
-                                }
+    fetch(`https://gartic.io/req/list?search=&language[]=8`)
+        .then(x => x.json())
+        .then(x => {
+            roomQueue = x; // Gelen odalar sırasıyla işlenecek
+            processNextRoom(); // İlk odayı işlemeye başla
+        });
+}
 
-                                ws.onmessage = (msg) => {
-                                    if (msg.data.indexOf('42["5"') !== -1) {
-                                        addPlayers(JSON.parse('[{"id":' + msg.data.split('[{"id":')[1].split("}]")[0] + "}]"), room.code);
-                                        filterUsers();
-                                    }
-                                }
-                            })
-                    })
-                })
-        }
+function processNextRoom() {
+    if (roomQueue.length === 0) return; // Kuyruk boşsa, işlemi sonlandır
+
+    const room = roomQueue.shift(); // İlk odayı çıkar
+
+    fetch(`https://gartic.io/serverViewer?v3=1&room=${room.code}`)
+        .then(x => x.text())
+        .then(x => {
+            const roomSC = x.split("https://")[1].split(".")[0];
+            let ws = new WebSocket(`wss://${roomSC}.gartic.io/socket.io/?EIO=3&transport=websocket`);
+
+            ws.onopen = () => {
+                ws.send('42[12,{"v":20000,"platform":0,"sala":"' + room.id + '"}]');
+                ws.send('42[46,0]');
+            };
+
+            ws.onmessage = (msg) => {
+                if (msg.data.indexOf('42["5"') !== -1) {
+                    addPlayers(JSON.parse('[{"id":' + msg.data.split('[{"id":')[1].split("}]")[0] + "}]"), room.code);
+                    filterUsers();
+                }
+
+                // Bu odadaki işlem tamamlandıktan sonra bir sonraki odaya geç
+                processNextRoom();
+            };
+        });
+}
+
 
         function extractDiscordID(avatarURL) {
             const matches = avatarURL.match(/\/avatars\/(\d+)\//);
