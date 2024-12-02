@@ -159,7 +159,7 @@
                             <b>${user.nick}</b><br>
                             <i>${user.pontos} pt</i>&nbsp;&nbsp;
                             <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                            <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink} izle</a>
+                            <a target="_blank" href="https://gartic.io/${roomlink}/viewer">#${roomlink} izle</a>
                             <span class="download-btn" onclick="openProfile('${foto}')">Profil Fotoğrafını Aç</span>
                         </div>
                     </div>
