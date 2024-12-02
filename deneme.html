@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gartic.io Room Users</title>
+    <title>Gartic.io Room Processor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: row;
         }
         .container {
-            width: 90%;
-            margin: auto;
+            width: 75%;
+            margin: 20px;
+        }
+        .sidebar {
+            width: 25%;
+            background-color: #f4f4f4;
             padding: 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -28,11 +35,14 @@
         th {
             background-color: #f4f4f4;
         }
+        h2 {
+            margin-top: 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Gartic.io Room Users</h1>
+        <h1>Gartic.io Rooms Processor</h1>
         <table>
             <thead>
                 <tr>
@@ -46,15 +56,28 @@
             </tbody>
         </table>
     </div>
+    <div class="sidebar">
+        <h2>Active Rooms</h2>
+        <p id="activeRooms">Fetching...</p>
+        <h2>Current Room</h2>
+        <p id="currentRoom">None</p>
+    </div>
 
     <script>
         async function fetchRoomsSequentially() {
             const response = await fetch(`https://gartic.io/req/list?search=&language[]=8`);
             const rooms = await response.json();
 
+            // Sağ tarafta aktif oda sayısını göster
+            document.getElementById("activeRooms").textContent = `${rooms.length} rooms found`;
+
+            // Oda işlemlerini sırayla yap
             for (const room of rooms) {
+                document.getElementById("currentRoom").textContent = `Processing Room: ${room.code}`;
                 await processRoom(room);
             }
+
+            document.getElementById("currentRoom").textContent = "All rooms processed.";
         }
 
         async function processRoom(room) {
@@ -89,7 +112,7 @@
                             });
 
                             ws.close();
-                            resolve(); // Proceed to the next room
+                            resolve(); // İşlem bitti, sıradaki odaya geç
                         }
                     }
                 };
@@ -97,11 +120,12 @@
                 ws.onerror = () => {
                     console.error(`Error connecting to room: ${room.code}`);
                     ws.close();
-                    resolve(); // Proceed even if there is an error
+                    resolve(); // Hata olsa bile devam et
                 };
             });
         }
 
+        // İşlemleri başlat
         fetchRoomsSequentially();
     </script>
 </body>
