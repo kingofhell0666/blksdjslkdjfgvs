@@ -3,72 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User List</title>
+    <title>Gartic.io Player Listesi</title>
     <style>
         body {
             font-family: Arial, sans-serif;
         }
+
         .user {
             display: flex;
             margin-bottom: 10px;
         }
+
         .user img {
+            border-radius: 50%;
             margin-right: 10px;
         }
-        .user .discord {
-            border: 2px solid #7289da;
-            padding: 5px;
-            border-radius: 50%;
+
+        .user .flex {
+            display: flex;
+            align-items: center;
         }
+
         .download-btn, .discord-profile-btn {
             cursor: pointer;
-            color: #0066cc;
-            text-decoration: underline;
+            color: #007BFF;
         }
+
         #profileContainer {
             display: none;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid #ccc;
-            padding: 20px;
-            position: absolute;
-            top: 50%;
+            position: fixed;
+            top: 20%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transform: translateX(-50%);
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        #profileContainer img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin-bottom: 15px;
+
+        #searchInput {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #filters {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 </head>
 <body>
-    <h1>Users in Room</h1>
-    <div>
-        <input type="text" id="searchInput" placeholder="Search users..." onkeyup="searchUsers()">
-        <label>
-            <input type="checkbox" id="havefotoCheckbox" onchange="filterUsers()"> Have Photo
-        </label>
-        <label>
-            <input type="checkbox" id="nofotoCheckbox" onchange="filterUsers()"> No Photo
-        </label>
-        <label>
-            <input type="checkbox" id="discordCheckbox" onchange="filterUsers()"> Discord Profile
-        </label>
+
+    <h1>Gartic.io Player Listesi</h1>
+
+    <input type="text" id="searchInput" placeholder="Kullanıcı ara..." onkeyup="searchUsers()">
+    
+    <div id="filters">
+        <label><input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı olanlar</label>
+        <label><input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı olmayanlar</label>
+        <label><input type="checkbox" id="discordCheckbox" onclick="filterUsers()"> Discord profili olanlar</label>
     </div>
-    <div id="playerCount">Player Count: 0</div>
-    <div id="totalPlayerCount">Total Players: 0</div>
+
+    <p id="totalPlayerCount">Toplam kişi sayısı: 0</p>
+    <p id="playerCount">Aktif oyuncu sayısı: 0</p>
+
     <div id="usersContainer"></div>
 
     <div id="profileContainer">
-        <h3 id="profileTitle"></h3>
-        <img id="profileImage" src="" alt="">
+        <h2 id="profileTitle"></h2>
+        <img id="profileImage" width="100">
         <p id="profileName"></p>
-        <button onclick="closeProfile()">Close</button>
+        <button onclick="closeProfile()">Kapat</button>
     </div>
 
     <script>
@@ -79,12 +92,12 @@
 
         function updatePlayerCount(count) {
             const playerCountElement = f("#playerCount");
-            playerCountElement.textContent = `Player Count: ${count}`;
+            playerCountElement.textContent = `Aktif oyuncu sayısı: ${count}`;
         }
 
         function updateTotalPlayerCount(count) {
             const totalPlayerCountElement = f("#totalPlayerCount");
-            totalPlayerCountElement.textContent = `Total Players: ${count}`;
+            totalPlayerCountElement.textContent = `Toplam kişi sayısı: ${count}`;
         }
 
         function addPlayers(users, roomlink) {
@@ -105,8 +118,8 @@
                             <b>${user.nick}</b><br>
                             <i>${user.pontos} pt</i>&nbsp;&nbsp;
                             <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                            <span class="download-btn" onclick="downloadPhoto('${foto}', '${user.nick}')">Download Photo</span>
-                            ${discordClass ? `<span class="discord-profile-btn" onclick="openDiscordProfile('${foto}')">Discord Profile</span>` : ""}
+                            <span class="download-btn" onclick="downloadPhoto('${foto}', '${user.nick}')">Fotoğrafı İndir</span>
+                            ${discordClass ? `<span class="discord-profile-btn" onclick="openDiscordProfile('${foto}')">Discord Profili</span>` : ""}
                         </div>
                     </div>
                 `;
@@ -126,10 +139,10 @@
             const profileImage = f("#profileImage");
             const profileName = f("#profileName");
 
-            profileTitle.textContent = `Profile: ${nick}`;
+            profileTitle.textContent = `Profil: ${nick}`;
             profileImage.src = foto;
-            profileImage.alt = `${nick}'s Profile Photo`;
-            profileName.textContent = `Username: ${nick}`;
+            profileImage.alt = `${nick}'in Profil Fotoğrafı`;
+            profileName.textContent = `Kullanıcı Adı: ${nick}`;
 
             profileContainer.style.display = 'flex';
         }
@@ -142,7 +155,7 @@
         function downloadPhoto(photoURL, userName) {
             const downloadLink = document.createElement('a');
             downloadLink.href = photoURL;
-            downloadLink.download = `${userName}_photo.png`;
+            downloadLink.download = `${userName}_foto.png`;
             downloadLink.target = "_blank";
             downloadLink.click();
         }
@@ -195,7 +208,7 @@
             updatePlayerCount(document.querySelectorAll('.user:visible').length);
         }
 
-        function listusers() {
+        function listusers(lang) {
             const usersContainer = f("#usersContainer");
             usersContainer.innerHTML = "";
 
@@ -230,7 +243,7 @@
             return matches ? matches[1] : null;
         }
 
-        listusers();
+        listusers(8);
     </script>
 </body>
 </html>
