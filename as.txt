@@ -135,37 +135,39 @@
             profileContainer.style.display = 'none';
         }
 
-     function filterUsers() {
+ function searchUsers() {
     const users = fa(".user");
+    const searchInput = f("#searchInput").value.toLowerCase();
     const havefotoCheckbox = f("#havefotoCheckbox");
     const nofotoCheckbox = f("#nofotoCheckbox");
 
     const isHaveFotoChecked = havefotoCheckbox.checked;
     const isNoFotoChecked = nofotoCheckbox.checked;
 
-    // Eğer hiçbir kutucuk işaretli değilse, hiç kullanıcı göstermemeliyiz
-    if (!isHaveFotoChecked && !isNoFotoChecked) {
-        users.forEach(user => {
-            user.style.display = "none";  // Hiçbir kullanıcı görünmemeli
-        });
-    } else {
-        // Checkbox'lara göre filtreleme yap
-        users.forEach(user => {
-            const havefoto = user.classList.contains("havefoto");
-            const nofoto = user.classList.contains("nofoto");
+    users.forEach(user => {
+        const userName = user.querySelector("b").textContent.toLowerCase();
+        const havefoto = user.classList.contains("havefoto");
+        const nofoto = user.classList.contains("nofoto");
 
-            // Eğer işaretli kutucuk varsa, ona göre kullanıcıyı göster
-            if ((isHaveFotoChecked && havefoto) || (isNoFotoChecked && nofoto)) {
-                user.style.display = "flex";
-            } else {
-                user.style.display = "none";
-            }
-        });
-    }
+        // Arama ve kutucuklara göre filtreleme yap
+        const matchesSearch = userName.includes(searchInput);
+        const matchesFilter = 
+            (!isHaveFotoChecked && !isNoFotoChecked) ||  // Hiçbir kutucuk işaretli değilse
+            (isHaveFotoChecked && havefoto) || 
+            (isNoFotoChecked && nofoto);
+
+        // Hem arama hem de filtreleme koşulunu kontrol et
+        if (matchesSearch && matchesFilter) {
+            user.style.display = "flex";
+        } else {
+            user.style.display = "none";
+        }
+    });
 
     // Görüntülenen kullanıcı sayısını güncelle
     updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
 }
+
 
 
         function searchUsers() {
