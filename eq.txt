@@ -45,54 +45,63 @@
             margin-top: 20px;
         }
 
-        .user {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 160px;
-            height: 230px;
-            transition: transform 0.3s ease;
-            cursor: pointer;
-            font-size: 14px;
-            border-left: 5px solid transparent;
-        }
+.user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f5f5f5;
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 5px solid #ccc; /* Odaya özel renk buradan geliyor */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Kutuyu yana doğru uzat */
+    max-width: 400px; /* İstersen genişliği sınırlayabilirsin */
+}
 
-        .user:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
+.user img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 12px;
+}
 
-        .user img {
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
+.user div {
+    flex: 1; /* İçeriği esnek yapar */
+}
 
-        .user b {
-            display: block;
-            margin-top: 5px;
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
-        }
+.user b {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
 
-        .user i {
-            font-size: 14px;
-            color: #777;
-        }
+.user i {
+    font-size: 12px;
+    color: #666;
+    display: block;
+    margin-top: 2px;
+}
 
-        .download-btn {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-            display: block;
-            margin-top: 10px;
-        }
+.user a {
+    font-size: 11px;
+    color: #007BFF;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.user .download-btn {
+    font-size: 10px;
+    color: #fff;
+    background-color: #007BFF;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 4px;
+}
+
 
         .download-btn:hover {
             text-decoration: underline;
