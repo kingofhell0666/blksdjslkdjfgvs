@@ -135,30 +135,30 @@
             profileContainer.style.display = 'none';
         }
 
-        function filterUsers() {
-            const users = fa(".user");
-            const havefotoCheckbox = f("#havefotoCheckbox");
-            const nofotoCheckbox = f("#nofotoCheckbox");
+       function filterUsers() {
+    const users = fa(".user");
+    const havefotoCheckbox = f("#havefotoCheckbox");
+    const nofotoCheckbox = f("#nofotoCheckbox");
 
-            const isHaveFotoChecked = havefotoCheckbox.checked;
-            const isNoFotoChecked = nofotoCheckbox.checked;
+    const isHaveFotoChecked = havefotoCheckbox.checked;
+    const isNoFotoChecked = nofotoCheckbox.checked;
 
-            users.forEach(user => {
-                const havefoto = user.classList.contains("havefoto");
-                const nofoto = user.classList.contains("nofoto");
+    users.forEach(user => {
+        const havefoto = user.classList.contains("havefoto");
+        const nofoto = user.classList.contains("nofoto");
 
-                // Her iki checkbox da işaretli değilse filtreleme yapılacak
-                if ((!isHaveFotoChecked && !isNoFotoChecked) || 
-                    (isHaveFotoChecked && havefoto) || 
-                    (isNoFotoChecked && nofoto)) {
-                    user.style.display = "flex";
-                } else {
-                    user.style.display = "none";
-                }
-            });
-
-            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+        // Her iki checkbox da işaretli değilse, tüm kullanıcılar görünmeli
+        if ((!isHaveFotoChecked && !isNoFotoChecked) || 
+            (isHaveFotoChecked && havefoto) || 
+            (isNoFotoChecked && nofoto)) {
+            user.style.display = "flex";
+        } else {
+            user.style.display = "none";
         }
+    });
+
+    updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+}
 
         function searchUsers() {
             const users = fa(".user");
