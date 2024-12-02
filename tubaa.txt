@@ -4,50 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kullanıcılar Listesi</title>
+    <!-- Bootstrap CSS Linki -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .user {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            margin: 10px 0;
+            justify-content: center;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 120px;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
         }
         .user img {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-bottom: 10px;
         }
-        .download-btn, .discord-profile-btn {
+        .user:hover {
+            transform: translateY(-5px);
+        }
+        .user .download-btn, .user .discord-profile-btn {
             cursor: pointer;
             color: blue;
             text-decoration: underline;
-            margin-left: 10px;
+            font-size: 12px;
+        }
+        .user b {
+            font-size: 14px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .search-container {
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Kullanıcılar Listesi</h1>
+    <div class="container">
+        <h1 class="my-4 text-center">Kullanıcılar Listesi</h1>
 
-    <div>
-        <label>
-            <input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olan
-        </label>
-        <label>
-            <input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olmayan
-        </label>
+        <!-- Arama ve Filtreleme -->
+        <div class="search-container d-flex justify-content-between mb-3">
+            <input type="text" id="searchInput" class="form-control w-50" oninput="searchUsers()" placeholder="Kullanıcı Ara...">
+            <div>
+                <label>
+                    <input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olan
+                </label>
+                <label class="ml-2">
+                    <input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olmayan
+                </label>
+            </div>
+        </div>
+
+        <div id="playerCount" class="text-center mb-3">0 kullanıcı</div>
+        <div id="totalPlayerCount" class="text-center mb-3">Toplam kişi sayısı: 0</div>
+
+        <div id="usersContainer" class="container"></div>
+
+        <div id="profileContainer" style="display:none; flex-direction: column; align-items: center;">
+            <h2 id="profileTitle"></h2>
+            <img id="profileImage" width="100" alt="Profile Photo">
+            <p id="profileName"></p>
+            <button class="btn btn-secondary" onclick="closeProfile()">Kapat</button>
+        </div>
     </div>
 
-    <input type="text" id="searchInput" oninput="searchUsers()" placeholder="Kullanıcı Ara...">
-
-    <div id="playerCount">0 kullanıcı</div>
-    <div id="totalPlayerCount">Toplam kişi sayısı: 0</div>
-
-    <div id="usersContainer"></div>
-
-    <div id="profileContainer" style="display:none; flex-direction: column; align-items: center;">
-        <h2 id="profileTitle"></h2>
-        <img id="profileImage" width="100" alt="Profile Photo">
-        <p id="profileName"></p>
-        <button onclick="closeProfile()">Kapat</button>
-    </div>
-
+    <!-- Bootstrap JS ve jQuery Bağlantıları -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         const f = (x) => { return document.querySelector(x) }
         const fa = (x) => { return document.querySelectorAll(x) }
@@ -75,14 +110,12 @@
                 const uclass = user.foto ? "havefoto" : "nofoto";
 
                 usersContainer.innerHTML += `
-                    <div class="user flex ${uclass}">
-                        <img width="40" src="${foto}" alt="">
-                        <div>
-                            <b>${user.nick}</b><br>
-                            <i>${user.pontos} pt</i>&nbsp;&nbsp;
-                            <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
-                            <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profili Görüntüle</span>
-                        </div>
+                    <div class="user ${uclass} text-center">
+                        <img src="${foto}" alt="">
+                        <b>${user.nick}</b><br>
+                        <i>${user.pontos} pt</i><br>
+                        <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
+                        <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profili Görüntüle</span>
                     </div>
                 `;
             });
@@ -113,10 +146,10 @@
 
             users.forEach(user => {
                 const userName = user.querySelector("b").textContent.toLowerCase();
-                user.style.display = userName.includes(searchInput) ? "flex" : "none";
+                user.style.display = userName.includes(searchInput) ? "block" : "none";
             });
 
-            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+            updatePlayerCount(document.querySelectorAll('.user[style="display: block;"]').length);
         }
 
         function filterUsers() {
@@ -127,28 +160,24 @@
             const isHaveFotoChecked = havefotoCheckbox.checked;
             const isNoFotoChecked = nofotoCheckbox.checked;
 
-            // Eğer hiçbir kutucuk işaretli değilse, hiç kullanıcı göstermemeliyiz
             if (!isHaveFotoChecked && !isNoFotoChecked) {
                 users.forEach(user => {
-                    user.style.display = "none";  // Hiçbir kullanıcı görünmemeli
+                    user.style.display = "none";
                 });
             } else {
-                // Checkbox'lara göre filtreleme yap
                 users.forEach(user => {
                     const havefoto = user.classList.contains("havefoto");
                     const nofoto = user.classList.contains("nofoto");
 
-                    // Eğer işaretli kutucuk varsa, ona göre kullanıcıyı göster
                     if ((isHaveFotoChecked && havefoto) || (isNoFotoChecked && nofoto)) {
-                        user.style.display = "flex";
+                        user.style.display = "block";
                     } else {
                         user.style.display = "none";
                     }
                 });
             }
 
-            // Görüntülenen kullanıcı sayısını güncelle
-            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+            updatePlayerCount(document.querySelectorAll('.user[style="display: block;"]').length);
         }
 
         function listusers(lang) {
@@ -197,7 +226,7 @@
                 .catch(error => console.error('Error fetching room list:', error));
         }
 
-        listusers(8);
+        listusers("tr");
     </script>
 </body>
 </html>
