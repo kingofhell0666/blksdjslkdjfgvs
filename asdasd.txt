@@ -49,8 +49,8 @@
     <div>
         <h1>Gartic Kullanıcıları</h1>
         <div>
-            <label><input type="checkbox" id="havefotoCheckbox"> Fotoğrafı Olanlar</label>
-            <label><input type="checkbox" id="nofotoCheckbox"> Fotoğrafı Olmayanlar</label>
+            <label><input type="checkbox" id="havefotoCheckbox" checked> Fotoğrafı Olanlar</label>
+            <label><input type="checkbox" id="nofotoCheckbox" checked> Fotoğrafı Olmayanlar</label>
         </div>
         <input type="text" id="searchInput" placeholder="Kullanıcı Ara" oninput="searchUsers()">
         <div id="usersContainer"></div>
@@ -140,10 +140,20 @@
             const havefotoCheckbox = f("#havefotoCheckbox");
             const nofotoCheckbox = f("#nofotoCheckbox");
 
+            // Eğer hiçbir seçenek işaretli değilse, kullanıcılar görünmemeli
+            if (!havefotoCheckbox.checked && !nofotoCheckbox.checked) {
+                users.forEach(user => {
+                    user.style.display = "none";
+                });
+                updatePlayerCount(0);
+                return;
+            }
+
             users.forEach(user => {
                 const hasFoto = user.classList.contains("havefoto");
                 const hasNoFoto = user.classList.contains("nofoto");
 
+                // Filtreye göre görünürlüğü ayarla
                 if (havefotoCheckbox.checked && !hasFoto) {
                     user.style.display = "none";
                 } else if (nofotoCheckbox.checked && !hasNoFoto) {
