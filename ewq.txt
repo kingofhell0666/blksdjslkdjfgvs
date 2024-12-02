@@ -124,7 +124,6 @@
     </div>
 
 
-    <div id="playerCount">0 kullanıcı</div>
     <div id="totalPlayerCount">Toplam kişi sayısı: 0</div>
 
     <div id="usersContainer"></div>
