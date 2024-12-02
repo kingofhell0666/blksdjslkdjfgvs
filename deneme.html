@@ -64,85 +64,79 @@
     </div>
 
     <script>
-   function listusers(lang) {
-    const usersContainer = document.querySelector("#userList");
-    usersContainer.innerHTML = "";  // Clear previous users
+        function listusers(lang) {
+            const usersContainer = document.querySelector("#userList");
+            usersContainer.innerHTML = "";  // Clear previous users
 
-    fetch(`https://gartic.io/req/list?search=&language[]=${lang}`)
-        .then(response => response.json())
-        .then(rooms => {
-            // Filter active rooms (where quant >= 1)
-            const activeRooms = rooms.filter(room => room.quant >= 1);
-            document.getElementById("activeRooms").textContent = `${activeRooms.length} active rooms found`;
+            fetch(`https://gartic.io/req/list?search=&language[]=${lang}`)
+                .then(response => response.json())
+                .then(rooms => {
+                    // Filter active rooms (where quant >= 1)
+                    const activeRooms = rooms.filter(room => room.quant >= 1);
+                    document.getElementById("activeRooms").textContent = `${activeRooms.length} active rooms found`;
 
-            // Process each active room
-            activeRooms.forEach((room, index) => {
-                fetch(`https://gartic.io/serverViewer?v3=1&room=${room.code}`)
-                    .then(response => response.text())
-                    .then(serverData => {
-                        const roomSC = serverData.split("https://")[1].split(".")[0];
-                        let ws = new WebSocket(`wss://${roomSC}.gartic.io/socket.io/?EIO=3&transport=websocket`);
+                    // Process each active room
+                    activeRooms.forEach((room, index) => {
+                        fetch(`https://gartic.io/serverViewer?v3=1&room=${room.code}`)
+                            .then(response => response.text())
+                            .then(serverData => {
+                                const roomSC = serverData.split("https://")[1].split(".")[0];
+                                let ws = new WebSocket(`wss://${roomSC}.gartic.io/socket.io/?EIO=3&transport=websocket`);
 
-                        ws.onopen = () => {
-                            ws.send('42[12,{"v":20000,"platform":0,"sala":"' + room.id + '"}]');
-                            ws.send('42[46,0]');
-                        };
+                                ws.onopen = () => {
+                                    ws.send('42[12,{"v":20000,"platform":0,"sala":"' + room.id + '"}]');
+                                    ws.send('42[46,0]');
+                                };
 
-                        ws.onmessage = (msg) => {
-                            if (msg.data.indexOf('42["5"') !== -1) {
-                                try {
-                                    // Clean the data to get valid JSON
-                                    const jsonData = msg.data.split('42["5",')[1].split(']')[0]; // Extract user data part
-                                    const userData = JSON.parse('[' + jsonData + ']');  // Wrap in array and parse as JSON
+                                ws.onmessage = (msg) => {
+                                    if (msg.data.indexOf('42["5"') !== -1) {
+                                        try {
+                                            // Parsing the correct user data from WebSocket message and extracting the nickname (nick)
+                                            const userData = JSON.parse(msg.data.split('[{"id":')[1].split("}]")[0] + "}]");
+                                            addPlayers(userData, room.code);
+                                            filterUsers();
+                                        } catch (e) {
+                                            console.error("Error parsing user data:", e);
+                                        }
+                                    }
+                                };
 
-                                    // Add players with the correct nick
-                                    userData.forEach(user => {
-                                        const userId = user.id;
-                                        const userNick = user.nick || "Unknown User";  // Default to "Unknown User" if no nick exists
-                                        addPlayers(userId, userNick, room.code);
-                                    });
+                                ws.onerror = () => {
+                                    console.error(`Error with room ${room.code}`);
+                                };
 
-                                    filterUsers();
-                                } catch (e) {
-                                    console.error("Error parsing user data:", e);
-                                }
-                            }
-                        };
-
-                        ws.onerror = () => {
-                            console.error(`Error with room ${room.code}`);
-                        };
-
-                        // Show the current room being processed
-                        document.getElementById("currentRoom").textContent = `Processing Room: ${room.code}`;
+                                // Show the current room being processed
+                                document.getElementById("currentRoom").textContent = `Processing Room: ${room.code}`;
+                            });
                     });
+                })
+                .catch(error => console.error("Error fetching rooms:", error));
+        }
+
+        // Add players to the table
+        function addPlayers(users, roomCode) {
+            const usersContainer = document.querySelector("#userList");
+
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                const username = user.nick || "Unknown User"; // Check if nick exists, if not use "Unknown User"
+                row.innerHTML = `
+                    <td>${roomCode}</td>
+                    <td>${user.id}</td>
+                    <td>${username}</td>
+                `;
+                usersContainer.appendChild(row);
             });
-        })
-        .catch(error => console.error("Error fetching rooms:", error));
-}
+        }
 
-// Add players to the table
-function addPlayers(userId, userNick, roomCode) {
-    const usersContainer = document.querySelector("#userList");
+        // Placeholder for filtering users (can be expanded with specific functionality)
+        function filterUsers() {
+            console.log("Filtering users...");
+            // You can add functionality here to filter users (e.g., by name, by room, etc.)
+        }
 
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${roomCode}</td>
-        <td>${userId}</td>
-        <td>${userNick}</td>
-    `;
-    usersContainer.appendChild(row);
-}
-
-// Placeholder for filtering users (can be expanded with specific functionality)
-function filterUsers() {
-    console.log("Filtering users...");
-    // You can add functionality here to filter users (e.g., by name, by room, etc.)
-}
-
-// Initialize the user listing by calling the function with the desired language code
-listusers(8);  // Example for language code 8 (Turkish)
-
+        // Initialize the user listing by calling the function with the desired language code
+        listusers(8);  // Example for language code 8 (Turkish)
     </script>
 </body>
 </html>
