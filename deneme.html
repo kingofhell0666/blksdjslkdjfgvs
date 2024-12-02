@@ -64,7 +64,7 @@
     </div>
 
     <script>
-       function listusers(lang) {
+   function listusers(lang) {
     const usersContainer = document.querySelector("#userList");
     usersContainer.innerHTML = "";  // Clear previous users
 
@@ -91,9 +91,10 @@
                         ws.onmessage = (msg) => {
                             if (msg.data.indexOf('42["5"') !== -1) {
                                 try {
-                                    // Extract user data from the WebSocket message
-                                    const userData = JSON.parse(msg.data.split('42["5"')[1].split(']')[0] + "]");
-                                    
+                                    // Clean the data to get valid JSON
+                                    const jsonData = msg.data.split('42["5",')[1].split(']')[0]; // Extract user data part
+                                    const userData = JSON.parse('[' + jsonData + ']');  // Wrap in array and parse as JSON
+
                                     // Add players with the correct nick
                                     userData.forEach(user => {
                                         const userId = user.id;
