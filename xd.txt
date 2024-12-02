@@ -84,7 +84,7 @@
         <button onclick="closeProfile()">Kapat</button>
     </div>
 
-    <script>
+   <script>
     const f = (x) => { return document.querySelector(x) }
     const fa = (x) => { return document.querySelectorAll(x) }
 
@@ -153,6 +153,7 @@
                 });
 
                 let index = 0; // Her odanın isteklerini sırayla göndereceğiz
+
                 function fetchRoomData() {
                     if (index >= rooms.length) return; // Eğer tüm odalar işlendiyse, işlemi bitir
                     const roomCode = rooms[index];
