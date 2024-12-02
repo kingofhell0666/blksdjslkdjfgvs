@@ -183,6 +183,49 @@ function searchUsers() {
 
         // Eğer hiçbir kutucuk işaretli değilse, kullanıcıyı gizle
         if (!isHaveFotoChecked && !isNoFotoChecked) {
+            user.style.display = "none";  // Hiçbir şey gösterilmesin
+        } else {
+            // Kullanıcıyı hem arama hem de kutucuklara göre kontrol et
+            const matchesSearch = userName.includes(searchInput);
+            let matchesFilter = false;
+
+            // Arama yalnızca işaretli olanlar için yapılmalı
+            if (isHaveFotoChecked && havefoto && matchesSearch) {
+                matchesFilter = true;  // Profil fotoğrafı olan kullanıcıda arama
+            } else if (isNoFotoChecked && nofoto && matchesSearch) {
+                matchesFilter = true;  // Profil fotoğrafı olmayan kullanıcıda arama
+            }
+
+            // Eğer kullanıcı hem filtreye hem de aramaya uyuyorsa, göster
+            if (matchesFilter) {
+                user.style.display = "flex";
+            } else {
+                user.style.display = "none";
+            }
+        }
+    });
+
+    // Görüntülenen kullanıcı sayısını güncelle
+    updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+}
+
+
+function searchUsers() {
+    const users = fa(".user");
+    const searchInput = f("#searchInput").value.toLowerCase();
+    const havefotoCheckbox = f("#havefotoCheckbox");
+    const nofotoCheckbox = f("#nofotoCheckbox");
+
+    const isHaveFotoChecked = havefotoCheckbox.checked;
+    const isNoFotoChecked = nofotoCheckbox.checked;
+
+    users.forEach(user => {
+        const userName = user.querySelector("b").textContent.toLowerCase();
+        const havefoto = user.classList.contains("havefoto");
+        const nofoto = user.classList.contains("nofoto");
+
+        // Eğer hiçbir kutucuk işaretli değilse, kullanıcıyı gizle
+        if (!isHaveFotoChecked && !isNoFotoChecked) {
             user.style.display = "none";
         } else {
             // Kullanıcıyı arama metni ve işaretli kutucuklara göre göster
