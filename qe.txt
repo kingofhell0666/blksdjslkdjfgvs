@@ -9,14 +9,16 @@
         .havefoto { color: green; }
         .nofoto { color: red; }
         .flex { display: flex; }
+.user-select-none {user-select: none;}
+
     </style>
 </head>
 <body>
 
     <div>
-        <label><input type="checkbox" id="havefotoCheckbox"> Profil fotoğrafı olanlar</label>
-        <label><input type="checkbox" id="nofotoCheckbox"> Profil fotoğrafı olmayanlar</label>
-    </div>
+    <label><input type="checkbox" id="havefotoCheckbox"> <span class="user-select-none">Profil fotoğrafı olanlar</span></label>
+    <label><input type="checkbox" id="nofotoCheckbox"> <span class="user-select-none">Profil fotoğrafı olmayanlar</span></label>
+</div>
 
     <div>
         <p id="totalPlayerCount">Toplam kişi sayısı: 0</p>
