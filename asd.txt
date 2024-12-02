@@ -3,69 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gartic Kullanıcı Listesi</title>
+    <title>Player List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
+        }
+        #usersContainer {
+            margin-top: 20px;
+        }
+        .user {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .havefoto img, .nofoto img {
+            border-radius: 50%;
+        }
+        .havefoto {
+            background-color: #f0f0f0;
+        }
+        .nofoto {
+            background-color: #ccc;
+        }
+        .download-btn {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
         }
         #profileContainer {
             display: none;
+            flex-direction: column;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #fff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-        .user {
             background-color: #fff;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        .user img {
+        #profileContainer img {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-        }
-        .download-btn {
-            cursor: pointer;
-            color: #007bff;
-            text-decoration: underline;
-        }
-        .download-btn:hover {
-            color: #0056b3;
         }
     </style>
 </head>
 <body>
 
+    <h1>Oyun Odası Kullanıcıları</h1>
+
     <div>
-        <h1>Gartic Kullanıcıları</h1>
-        <div>
-            <label><input type="checkbox" id="havefotoCheckbox" checked> Fotoğrafı Olanlar</label>
-            <label><input type="checkbox" id="nofotoCheckbox" checked> Fotoğrafı Olmayanlar</label>
-        </div>
-        <input type="text" id="searchInput" placeholder="Kullanıcı Ara" oninput="searchUsers()">
-        <div id="usersContainer"></div>
+        <label>
+            <input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olanlar
+        </label>
+        <label>
+            <input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olmayanlar
+        </label>
     </div>
+
+    <input type="text" id="searchInput" placeholder="Kullanıcı Ara" oninput="searchUsers()">
+    
+    <p id="totalPlayerCount">Toplam kişi sayısı: 0</p>
+    <p>Kullanıcı sayısı: <span id="playerCount">0</span></p>
+
+    <div id="usersContainer"></div>
 
     <div id="profileContainer">
         <h2 id="profileTitle"></h2>
-        <img id="profileImage" width="100" alt="">
+        <img id="profileImage" alt="">
         <p id="profileName"></p>
         <button onclick="closeProfile()">Kapat</button>
-    </div>
-
-    <div>
-        <h2 id="totalPlayerCount"></h2>
-        <h3>Aktif Kişi Sayısı: <span id="playerCount"></span></h3>
     </div>
 
     <script>
@@ -76,7 +84,7 @@
 
         function updatePlayerCount(count) {
             const playerCountElement = f("#playerCount");
-            playerCountElement.textContent = count;
+            playerCountElement.textContent = `${count}`;
         }
 
         function updateTotalPlayerCount(count) {
@@ -140,30 +148,27 @@
             const havefotoCheckbox = f("#havefotoCheckbox");
             const nofotoCheckbox = f("#nofotoCheckbox");
 
-            // Eğer hiçbir seçenek işaretli değilse, kullanıcılar görünmemeli
-            if (!havefotoCheckbox.checked && !nofotoCheckbox.checked) {
-                users.forEach(user => {
-                    user.style.display = "none";
-                });
-                updatePlayerCount(0);
-                return;
+            if (havefotoCheckbox.checked) {
+                nofotoCheckbox.disabled = false;
+            } else if (nofotoCheckbox.checked) {
+                havefotoCheckbox.disabled = false;
+            } else {
+                havefotoCheckbox.disabled = false;
+                nofotoCheckbox.disabled = false;
             }
 
             users.forEach(user => {
-                const hasFoto = user.classList.contains("havefoto");
-                const hasNoFoto = user.classList.contains("nofoto");
+                const havefoto = user.classList.contains("havefoto");
+                const nofoto = user.classList.contains("nofoto");
 
-                // Filtreye göre görünürlüğü ayarla
-                if (havefotoCheckbox.checked && !hasFoto) {
-                    user.style.display = "none";
-                } else if (nofotoCheckbox.checked && !hasNoFoto) {
-                    user.style.display = "none";
-                } else {
+                if ((havefotoCheckbox.checked && havefoto) || (nofotoCheckbox.checked && nofoto)) {
                     user.style.display = "flex";
+                } else {
+                    user.style.display = "none";
                 }
             });
 
-            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+            updatePlayerCount(document.querySelectorAll('.user:visible').length);
         }
 
         function searchUsers() {
@@ -175,7 +180,7 @@
                 user.style.display = userName.includes(searchInput) ? "flex" : "none";
             });
 
-            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
+            updatePlayerCount(document.querySelectorAll('.user:visible').length);
         }
 
         function listusers(lang) {
@@ -226,5 +231,6 @@
 
         listusers(8);
     </script>
+
 </body>
 </html>
