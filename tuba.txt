@@ -3,53 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtreleme ve Arama</title>
+    <title>Kullanıcılar Listesi</title>
     <style>
         .user {
-            display: none;
-            padding: 10px;
-            border: 1px solid #ccc;
-            margin: 5px;
-            border-radius: 5px;
-        }
-        .user.flex {
             display: flex;
             align-items: center;
+            margin: 10px 0;
         }
         .user img {
+            border-radius: 50%;
             margin-right: 10px;
         }
         .download-btn, .discord-profile-btn {
             cursor: pointer;
             color: blue;
             text-decoration: underline;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Kullanıcı Listesi</h1>
-
-    <!-- Filtreleme kutucukları -->
-    <label>
-        <input type="checkbox" id="havefotoCheckbox" onchange="filterUsers()"> Profil Fotoğrafı Olanlar
-    </label>
-    <label>
-        <input type="checkbox" id="nofotoCheckbox" onchange="filterUsers()"> Profil Fotoğrafı Olmayanlar
-    </label>
-
-    <!-- Arama kutusu -->
-    <input type="text" id="searchInput" placeholder="Kullanıcı arayın..." oninput="searchUsers()">
+    <h1>Kullanıcılar Listesi</h1>
 
     <div>
-        <h3 id="totalPlayerCount">Toplam kişi sayısı: 0</h3>
-        <h3 id="playerCount">Görüntülenen kişi sayısı: 0</h3>
+        <label>
+            <input type="checkbox" id="havefotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olan
+        </label>
+        <label>
+            <input type="checkbox" id="nofotoCheckbox" onclick="filterUsers()"> Fotoğrafı Olmayan
+        </label>
     </div>
+
+    <input type="text" id="searchInput" oninput="searchUsers()" placeholder="Kullanıcı Ara...">
+
+    <div id="playerCount">0 kullanıcı</div>
+    <div id="totalPlayerCount">Toplam kişi sayısı: 0</div>
 
     <div id="usersContainer"></div>
 
-    <div id="profileContainer" style="display: none; flex-direction: column; align-items: center;">
+    <div id="profileContainer" style="display:none; flex-direction: column; align-items: center;">
         <h2 id="profileTitle"></h2>
-        <img id="profileImage" src="" alt="" width="100">
+        <img id="profileImage" width="100" alt="Profile Photo">
         <p id="profileName"></p>
         <button onclick="closeProfile()">Kapat</button>
     </div>
@@ -62,7 +56,7 @@
 
         function updatePlayerCount(count) {
             const playerCountElement = f("#playerCount");
-            playerCountElement.textContent = `Görüntülenen kişi sayısı: ${count}`;
+            playerCountElement.textContent = `${count} kullanıcı`;
         }
 
         function updateTotalPlayerCount(count) {
@@ -87,10 +81,42 @@
                             <b>${user.nick}</b><br>
                             <i>${user.pontos} pt</i>&nbsp;&nbsp;
                             <a target="_blank" href="https://gartic.io/${roomlink}">#${roomlink}</a><br>
+                            <span class="download-btn" onclick="openProfile('${user.nick}', '${foto}')">Profili Görüntüle</span>
                         </div>
                     </div>
                 `;
             });
+        }
+
+        function openProfile(nick, foto) {
+            const profileContainer = f("#profileContainer");
+            const profileTitle = f("#profileTitle");
+            const profileImage = f("#profileImage");
+            const profileName = f("#profileName");
+
+            profileTitle.textContent = `Profil: ${nick}`;
+            profileImage.src = foto;
+            profileImage.alt = `${nick}'s Profile Photo`;
+            profileName.textContent = `Kullanıcı Adı: ${nick}`;
+
+            profileContainer.style.display = 'flex';
+        }
+
+        function closeProfile() {
+            const profileContainer = f("#profileContainer");
+            profileContainer.style.display = 'none';
+        }
+
+        function searchUsers() {
+            const users = fa(".user");
+            const searchInput = f("#searchInput").value.toLowerCase();
+
+            users.forEach(user => {
+                const userName = user.querySelector("b").textContent.toLowerCase();
+                user.style.display = userName.includes(searchInput) ? "flex" : "none";
+            });
+
+            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
         }
 
         function filterUsers() {
@@ -112,7 +138,7 @@
                     const havefoto = user.classList.contains("havefoto");
                     const nofoto = user.classList.contains("nofoto");
 
-                    // Kullanıcıyı yalnızca işaretli kutucuklara göre göster
+                    // Eğer işaretli kutucuk varsa, ona göre kullanıcıyı göster
                     if ((isHaveFotoChecked && havefoto) || (isNoFotoChecked && nofoto)) {
                         user.style.display = "flex";
                     } else {
@@ -125,68 +151,6 @@
             updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
         }
 
-        function searchUsers() {
-            const users = fa(".user");
-            const searchInput = f("#searchInput").value.toLowerCase();
-            const havefotoCheckbox = f("#havefotoCheckbox");
-            const nofotoCheckbox = f("#nofotoCheckbox");
-
-            const isHaveFotoChecked = havefotoCheckbox.checked;
-            const isNoFotoChecked = nofotoCheckbox.checked;
-
-            users.forEach(user => {
-                const userName = user.querySelector("b").textContent.toLowerCase();
-                const havefoto = user.classList.contains("havefoto");
-                const nofoto = user.classList.contains("nofoto");
-
-                // Eğer hiçbir kutucuk işaretli değilse, kullanıcıyı gizle
-                if (!isHaveFotoChecked && !isNoFotoChecked) {
-                    user.style.display = "none";  // Hiçbir şey gösterilmesin
-                } else {
-                    // Kullanıcıyı hem arama hem de kutucuklara göre kontrol et
-                    const matchesSearch = userName.includes(searchInput);
-                    let matchesFilter = false;
-
-                    // Arama yalnızca işaretli olanlar için yapılmalı
-                    if (isHaveFotoChecked && havefoto && matchesSearch) {
-                        matchesFilter = true;  // Profil fotoğrafı olan kullanıcıda arama
-                    } else if (isNoFotoChecked && nofoto && matchesSearch) {
-                        matchesFilter = true;  // Profil fotoğrafı olmayan kullanıcıda arama
-                    }
-
-                    // Eğer kullanıcı hem filtreye hem de aramaya uyuyorsa, göster
-                    if (matchesFilter) {
-                        user.style.display = "flex";
-                    } else {
-                        user.style.display = "none";
-                    }
-                }
-            });
-
-            // Görüntülenen kullanıcı sayısını güncelle
-            updatePlayerCount(document.querySelectorAll('.user[style="display: flex;"]').length);
-        }
-
-        function openProfile(nick, foto) {
-            const profileContainer = f("#profileContainer");
-            const profileTitle = f("#profileTitle");
-            const profileImage = f("#profileImage");
-            const profileName = f("#profileName");
-
-            profileTitle.textContent = `Profile: ${nick}`;
-            profileImage.src = foto;
-            profileImage.alt = `${nick}'s Profile Photo`;
-            profileName.textContent = `Username: ${nick}`;
-
-            profileContainer.style.display = 'flex';
-        }
-
-        function closeProfile() {
-            const profileContainer = f("#profileContainer");
-            profileContainer.style.display = 'none';
-        }
-
-        // Kullanıcıları listelemek için
         function listusers(lang) {
             const usersContainer = f("#usersContainer");
             usersContainer.innerHTML = "";
@@ -233,7 +197,7 @@
                 .catch(error => console.error('Error fetching room list:', error));
         }
 
-        listusers(8);  // Dili 8 (Türkçe) olarak belirle
+        listusers(8);
     </script>
 </body>
 </html>
